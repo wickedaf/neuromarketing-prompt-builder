@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neuromarketing Prompt Builder</title>
+  <style>
+    /* Global styles and reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Base body styles */
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+      line-height: 1.6;
+      color: #374151; /* Default text color for light mode */
+    }
+
+    /* Container for the main content */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Header section styles */
+    .header {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Header background pattern animation */
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="3" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+      animation: float 20s infinite linear;
+    }
+
+    @keyframes float {
+      0% { transform: translateX(-100px); }
+      100% { transform: translateX(100px); }
+    }
+
+    /* Header text styles */
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Form container and grid */
+    .form-container {
+      padding: 3rem 2rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .form-group {
+      position: relative;
+    }
+
+    /* Label styles */
+    label {
+      display: block;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    /* Input, textarea, select styles (adjusted for full width and padding) */
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%; /* Make full width */
+      padding: 1rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px; /* Apply rounded corners */
+      font-size: 1rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: white; /* Default background for light mode */
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      transform: translateY(-2px);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Generate button styles */
+    .generate-btn {
+      width: 100%;
+      padding: 1.25rem 2rem;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 1.5rem; /* Space between prompt and content generate buttons */
+    }
+
+    .generate-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .generate-btn:hover::before {
+      left: 100%;
+    }
+
+    .generate-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+
+    .generate-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Output section styles */
+    .output-section {
+      margin-top: 2rem;
+      padding: 2rem;
+      background: #f8fafc;
+      border-radius: 16px;
+      border: 2px dashed #cbd5e1;
+      position: relative;
+      min-height: 200px;
+    }
+
+    .output-section.has-content {
+      border: 2px solid #10b981;
+      background: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .output-title {
+      font-weight: 700;
+      color: #374151;
+      font-size: 1.1rem;
+    }
+
+    .copy-btn {
+      padding: 0.5rem 1rem;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .copy-btn:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    .copy-btn.copied {
+      background: #6366f1;
+    }
+
+    .output-content {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      color: #374151;
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #9ca3af;
+      font-style: italic;
+      padding: 3rem 1rem;
+    }
+
+    .empty-state::before {
+      content: '🧠';
+      display: block;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* Dark mode styles (variables and rules) */
+    [data-theme="dark"] {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-card: rgba(30, 41, 59, 0.95);
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --border-color: #334155;
+      --input-bg: #334155; /* Input background for dark mode */
+      --accent-color: #6366f1;
+    }
+
+    [data-theme="dark"] body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+    }
+
+    [data-theme="dark"] input[type="text"],
+    [data-theme="dark"] textarea,
+    [data-theme="dark"] select {
+      background: var(--input-bg); /* Apply dark mode background */
+      border-color: var(--border-color); /* Apply dark mode border color */
+      color: var(--text-primary); /* Apply dark mode text color */
+    }
+
+    [data-theme="dark"] input[type="text"]::placeholder,
+    [data-theme="dark"] textarea::placeholder {
+      color: #64748b;
+    }
+
+    [data-theme="dark"] label {
+      color: var(--text-secondary);
+    }
+
+    [data-theme="dark"] .output-section {
+      background: var(--bg-secondary);
+      border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .output-section.has-content {
+      background: var(--bg-secondary);
+      border-color: var(--accent-color);
+    }
+
+    [data-theme="dark"] .output-content {
+      background: var(--bg-primary);
+      border-color: var(--border-color);
+      color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .output-title {
+      color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .output-header {
+      border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .empty-state {
+      color: #64748b;
+    }
+
+    /* Theme toggle button */
+    .theme-toggle {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50px;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: white;
+      backdrop-filter: blur(10px);
+    }
+
+    .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    [data-theme="dark"] .theme-toggle {
+      background: rgba(0, 0, 0, 0.3);
+      border-color: var(--border-color);
+      color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .theme-toggle:hover {
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      .header {
+        padding: 2rem 1rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .form-container {
+        padding: 2rem 1rem;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .theme-toggle {
+        top: 1rem;
+        right: 1rem;
+      }
+    }
+
+    /* Loading animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Micro interactions (fade in animations) */
+    .form-group {
+      animation: fadeInUp 0.6s ease-out;
+      animation-fill-mode: both;
+    }
+
+    /* Adjusted nth-child delays for new fields */
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(4) { animation-delay: 0.4s; }
+    .form-group:nth-child(5) { animation-delay: 0.5s; } /* Tone */
+    .form-group:nth-child(6) { animation-delay: 0.6s; } /* Language */
+    .form-group:nth-child(7) { animation-delay: 0.7s; } /* Copy Type */
+    .form-group:nth-child(8) { animation-delay: 0.8s; } /* Success Metrics (Swapped) */
+    .form-group:nth-child(9) { animation-delay: 0.9s; } /* AI to Humanize (Swapped) */
+    .form-group:nth-child(10) { animation-delay: 1.0s; } /* Brand Personality */
+    .form-group:nth-child(11) { animation-delay: 1.1s; } /* Output Length (Container) */
+    .form-group:nth-child(12) { animation-delay: 1.2s; } /* Emoji Option */
+    .form-group:nth-child(13) { animation-delay: 1.3s; } /* Competitive Positioning */
+    .form-group:nth-child(14) { animation-delay: 1.4s; } /* Cultural Insights */
+    .form-group:nth-child(15) { animation-delay: 1.5s; } /* Context & Background */
+    .form-group:nth-child(16) { animation-delay: 1.6s; } /* Custom Instructions */
+    .form-group:nth-child(17) { animation-delay: 1.7s; } /* Desired Attributes */
+    .form-group:nth-child(18) { animation-delay: 1.8s; } /* Reference Examples */
+    .form-group:nth-child(19) { animation-delay: 1.9s; } /* Output Specifications */
+    .form-group:nth-child(20) { animation-delay: 2.0s; } /* Iteration Guidelines */
+    .form-group:nth-child(21) { animation-delay: 2.1s; } /* Initial Content Idea */
+
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Style for the checkbox containers */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      min-height: 58px; /* To align better with other inputs */
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #6366f1; /* Style the checkbox itself */
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .checkbox-group label {
+      margin-bottom: 0; /* Override default label margin */
+      cursor: pointer;
+      text-transform: none; /* Keep normal casing */
+      letter-spacing: normal;
+      font-weight: 500;
+      color: #374151; /* Default color */
+    }
+
+    [data-theme="dark"] .checkbox-group label {
+      color: var(--text-secondary); /* Dark mode color */
+    }
+
+    /* Styles for dynamic length input container */
+    .length-controls-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease-out;
+        overflow: hidden;
+        height: 0;
+        opacity: 0;
+        visibility: hidden;
+        margin-top: 10px; /* Space from checkbox */
+        width: fit-content; /* Added width: fit-content */
+    }
+
+    .length-controls-wrapper.show {
+        height: auto;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Individual styles for lengthUnit and lengthValue inputs within the wrapper */
+    .length-controls-wrapper #lengthUnit,
+    .length-controls-wrapper #lengthValue {
+        /* Reset common input styles that might conflict */
+        margin-top: 0;
+        width: auto; /* Allow flex to control width */
+    }
+
+    /* Style for lengthUnit input (datalist text type) */
+    .length-controls-wrapper #lengthUnit {
+      flex-grow: 1; /* Allow it to take up available space */
+      flex-shrink: 1;
+      flex-basis: auto;
+    }
+
+    /* Style for lengthValue input (number type) */
+    .length-controls-wrapper #lengthValue {
+      width: 30%; /* Set explicit width as requested */
+      flex-shrink: 0; /* Prevent shrinking below this width */
+    }
+
+
+    /* New styles for AI generated content section */
+    .ai-content-section {
+      margin-top: 2rem;
+      padding: 2rem;
+      background: #f8fafc;
+      border-radius: 16px;
+      border: 2px dashed #b7e4c7; /* Light green dashed border */
+      position: relative;
+      min-height: 100px; /* Smaller min-height than prompt output */
+    }
+
+    .ai-content-section.has-content {
+      border: 2px solid #28a745; /* Solid green border when content is present */
+      background: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="dark"] .ai-content-section {
+      background: var(--bg-secondary);
+      border-color: #5cb85c; /* Darker green for dark mode dashed border */
+    }
+
+    [data-theme="dark"] .ai-content-section.has-content {
+      background: var(--bg-secondary);
+      border-color: #28a745; /* Darker solid green for dark mode */
+    }
+
+    .ai-content-section .output-title {
+      color: #28a745; /* Green title for AI content */
+    }
+
+    [data-theme="dark"] .ai-content-section .output-title {
+      color: var(--text-primary); /* Use primary text color in dark mode */
+    }
+
+    .ai-content-section .output-content {
+      background: #e6ffe6; /* Very light green background for AI content */
+      border-color: #d4edda;
+    }
+
+    [data-theme="dark"] .ai-content-section .output-content {
+      background: var(--bg-primary); /* Use primary background in dark mode */
+      border-color: var(--border-color);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <span id="themeIcon">🌙</span>
+        <span id="themeText">Dark</span>
+      </button>
+      <h1>🧠 Neuromarketing Prompt Builder</h1>
+      <p class="subtitle">Create high-performance, psychology-driven content prompts</p>
+    </div>
+
+    <div class="form-container">
+      <div class="form-grid">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="funnel">🎯 Funnel Stage</label>
+            <div class="input-wrapper">
+              <input list="funnelOptions" id="funnel" placeholder="Select funnel stage...">
+              <datalist id="funnelOptions">
+                <option value="TOFU (Top of Funnel)">
+                <option value="MOFU (Middle of Funnel)">
+                <option value="BOFU (Bottom of Funnel)">
+                <option value="CTA (Call to Action)">
+              </datalist>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="emotion">❤️ Primary Emotion</label>
+            <div class="input-wrapper">
+              <input list="emotionOptions" id="emotion" placeholder="Choose emotional trigger...">
+              <datalist id="emotionOptions">
+                <option value="Curiosity">
+                <option value="Fear">
+                <option value="Aspiration">
+                <option value="Empathy">
+                <option value="Trust">
+                <option value="Excitement">
+                <option value="Urgency">
+              </datalist>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bias">🧩 Cognitive Bias</label>
+            <div class="input-wrapper">
+              <input list="biasOptions" id="bias" placeholder="Select psychological principle...">
+              <datalist id="biasOptions">
+                <option value="Loss Aversion">
+                <option value="Anchoring">
+                <option value="Social Proof">
+                <option value="Scarcity">
+                <option value="Authority Bias">
+                <option value="Reciprocity">
+                <option value="Commitment & Consistency">
+              </datalist>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="format">📄 Content Format</label>
+            <div class="input-wrapper">
+              <input list="formatOptions" id="format" placeholder="Choose content type...">
+              <datalist id="formatOptions">
+                <option value="Ad">
+                <option value="Email">
+                <option value="Landing Page">
+                <option value="Social Post">
+                <option value="Video Script">
+                <option value="Blog Post">
+              </datalist>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tone">🎭 Brand Tone</label>
+            <div class="input-wrapper">
+              <input list="toneOptions" id="tone" placeholder="Set the voice...">
+              <datalist id="toneOptions">
+                <option value="Playful">
+                <option value="Bold">
+                <option value="Empathetic">
+                <option value="Professional">
+                <option value="Conversational">
+                <option value="Authoritative">
+              </datalist>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="language">🌐 Language</label>
+            <div class="input-wrapper">
+              <input list="languageOptions" id="language" placeholder="Choose language...">
+              <datalist id="languageOptions">
+                <option value="EN (English)">
+                <option value="BN (Bengali)">
+                <option value="Bilingual (EN + BN)">
+              </datalist>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="copytype">✍️ Copy Type</label>
+            <div class="input-wrapper">
+              <input list="copytypeOptions" id="copytype" placeholder="Specify copy element...">
+              <datalist id="copytypeOptions">
+                <option value="Headline">
+                <option value="CTA">
+                <option value="Hook">
+                <option value="Story">
+                <option value="Value Proposition">
+              </datalist>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="successMetrics">📊 Success Metrics</label>
+            <div class="input-wrapper">
+              <input list="successMetricsOptions" id="successMetrics" placeholder="e.g., Increase CTR by 15%, Drive conversion intent...">
+              <datalist id="successMetricsOptions">
+                <option value="Increase CTR by 15%">
+                <option value="Drive more engagement">
+                <option value="Boost conversion intent">
+                <option value="Enhance brand recall">
+                <option value="Improve lead quality">
+              </datalist>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="humanizeAI">
+              <label for="humanizeAI">✨ AI to Humanize (Make it sound human)</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="personality">🌟 Brand Personality Traits</label>
+            <div class="input-wrapper">
+              <input list="personalityOptions" id="personality" placeholder="e.g., Innovative, Trustworthy, Humorous...">
+              <datalist id="personalityOptions">
+                <option value="Innovative">
+                <option value="Trustworthy">
+                <option value="Playful">
+                <option value="Professional">
+                <option value="Luxurious">
+                <option value="Approachable">
+                <option value="Edgy">
+              </datalist>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <div class="checkbox-group" style="margin-top:0;">
+              <input type="checkbox" id="includeEmojis">
+              <label for="includeEmojis">😊 Include Emojis</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>📏 Output Length</label>
+            <div class="checkbox-group" style="margin-top:0;">
+              <input type="checkbox" id="enableLengthLimit" onchange="toggleLengthControls()">
+              <label for="enableLengthLimit">Enable Length Limit</label>
+            </div>
+            <div id="lengthControlsWrapper" class="length-controls-wrapper">
+              <input list="lengthUnitOptions" id="lengthUnit" placeholder="e.g., words, characters" oninput="toggleLengthValueInput()">
+              <datalist id="lengthUnitOptions">
+                <option value="words">
+                <option value="characters">
+              </datalist>
+              <input type="number" id="lengthValue" min="1" placeholder="Count">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="competitivePositioning">⚔️ Competitive Positioning</label>
+            <textarea id="competitivePositioning" rows="3" placeholder="How does your brand stand out from competitors? What's your unique selling proposition?"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="culturalInsights">🌍 Cultural Insights</label>
+            <textarea id="culturalInsights" rows="3" placeholder="Any cultural nuances, local customs, or societal trends to consider for the content?"></textarea>
+          </div>
+        </div>
+
+
+        <div class="form-group">
+          <label for="context">🎯 Context & Background</label>
+          <textarea id="context" rows="3" placeholder="Provide context about your brand, target audience, campaign objectives, or situational background..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="instructions">🧠 Custom Instructions</label>
+          <textarea id="instructions" rows="3">Use vivid, sensory phrasing (“blazing fast” instead of “quick”); Inject micro-conversion cues (e.g. “Tap to discover”, “Swipe for proof”); Balance emotional + logical appeal, depending on funnel stage; Include optional translation into Bangla when requested</textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="attributes">✨ Desired Attributes</label>
+          <textarea id="attributes" rows="3" placeholder="Concise, rhythmic, clear, memorable..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="examples">🔁 Reference Examples</label>
+          <textarea id="examples" rows="3" placeholder="Provide gold-standard examples or inspiration..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="formatting">🧾 Output Specifications</label>
+          <textarea id="formatting" rows="3" placeholder="Character limits, structure requirements, style guidelines..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="iteration">🧪 Iteration Guidelines</label>
+          <textarea id="iteration" rows="3" placeholder="How should the AI review and improve the output..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="initialContentIdea">💡 Initial Content Idea / Topic</label>
+          <textarea id="initialContentIdea" rows="3" placeholder="Provide a brief idea or topic for the AI to generate content on. e.g., 'new organic coffee brand', 'eco-friendly water bottles', 'online coding course'"></textarea>
+        </div>
+
+      </div>
+
+      <button class="generate-btn" onclick="generatePromptAndContent()">
+        <span class="btn-text">✨ Generate Neuromarketing Prompt & Content</span>
+      </button>
+
+      <div class="output-section" id="outputSection">
+        <div class="empty-state">
+          Fill in the fields above and click generate to create your neuromarketing prompt
+        </div>
+      </div>
+
+      <div class="ai-content-section" id="aiContentSection" style="display: none;">
+        <div class="output-header">
+          <div class="output-title">✨ AI Generated Content</div>
+          <button class="copy-btn" onclick="copyAIContentToClipboard()">
+            📋 Copy Content
+          </button>
+        </div>
+        <div class="output-content" id="aiContentOutput">
+          </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Theme toggle functionality
+    function toggleTheme() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+      html.setAttribute('data-theme', newTheme);
+
+      if (newTheme === 'dark') {
+        themeIcon.textContent = '☀️';
+        themeText.textContent = 'Light';
+      } else {
+        themeIcon.textContent = '🌙';
+        themeText.textContent = 'Dark';
+      }
+
+      // Save preference
+      localStorage.setItem('theme', newTheme);
+    }
+
+    // Initialize theme
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+
+      html.setAttribute('data-theme', savedTheme);
+
+      if (savedTheme === 'dark') {
+        themeIcon.textContent = '☀️';
+        themeText.textContent = 'Light';
+      } else {
+        themeIcon.textContent = '🌙';
+        themeText.textContent = 'Dark';
+      }
+    }
+
+    // Function to toggle visibility of length controls based on checkbox
+    function toggleLengthControls() {
+      const lengthControlsWrapper = document.getElementById('lengthControlsWrapper');
+      const enableLengthLimitCheckbox = document.getElementById('enableLengthLimit');
+      if (enableLengthLimitCheckbox.checked) {
+        lengthControlsWrapper.classList.add('show');
+        // If enabling, also check if a unit is already selected to show count input
+        toggleLengthValueInput();
+      } else {
+        lengthControlsWrapper.classList.remove('show');
+        document.getElementById('lengthUnit').value = ''; // Clear unit
+        document.getElementById('lengthValue').value = ''; // Clear count
+        // Explicitly hide the lengthValue input when the wrapper is hidden
+        document.getElementById('lengthValue').style.display = 'none';
+      }
+    }
+
+    // Function to toggle visibility of length value input based on unit selection
+    function toggleLengthValueInput() {
+      const lengthUnitInput = document.getElementById('lengthUnit');
+      const lengthValueInput = document.getElementById('lengthValue');
+
+      if (lengthUnitInput.value.trim() !== '' && document.getElementById('enableLengthLimit').checked) {
+        lengthValueInput.style.display = 'inline-block'; // Show number input
+      } else {
+        lengthValueInput.style.display = 'none'; // Hide number input
+        lengthValueInput.value = ''; // Clear value when hidden
+      }
+    }
+
+    async function generatePromptAndContent() {
+      const btn = document.querySelector('.generate-btn');
+      const btnText = btn.querySelector('.btn-text');
+      const outputSection = document.getElementById('outputSection');
+      const aiContentSection = document.getElementById('aiContentSection');
+      const aiContentOutput = document.getElementById('aiContentOutput');
+
+      // Show loading state for main button
+      btn.disabled = true;
+      btnText.innerHTML = '<div class="loading"></div> Generating Prompt...';
+
+      // Clear previous AI content and hide section
+      aiContentOutput.textContent = '';
+      aiContentSection.style.display = 'none';
+      aiContentSection.classList.remove('has-content');
+
+      const funnel = document.getElementById('funnel').value;
+      const emotion = document.getElementById('emotion').value;
+      const bias = document.getElementById('bias').value;
+      const format = document.getElementById('format').value;
+      const tone = document.getElementById('tone').value;
+      const language = document.getElementById('language').value;
+      const copytype = document.getElementById('copytype').value;
+      const humanizeAI = document.getElementById('humanizeAI').checked;
+      const personality = document.getElementById('personality').value;
+
+      const enableLengthLimit = document.getElementById('enableLengthLimit').checked;
+      let outputLengthSpec = '';
+      if (enableLengthLimit) {
+        const lengthUnit = document.getElementById('lengthUnit').value;
+        const lengthValue = document.getElementById('lengthValue').value;
+        if (lengthUnit && lengthValue) {
+          outputLengthSpec = `${lengthValue} ${lengthUnit}`;
+        }
+      }
+
+      const includeEmojis = document.getElementById('includeEmojis').checked;
+      const successMetrics = document.getElementById('successMetrics').value;
+      const competitivePositioning = document.getElementById('competitivePositioning').value;
+      const culturalInsights = document.getElementById('culturalInsights').value;
+      const context = document.getElementById('context').value;
+      const instructions = document.getElementById('instructions').value;
+      const attributes = document.getElementById('attributes').value;
+      const examples = document.getElementById('examples').value;
+      const formatting = document.getElementById('formatting').value;
+      const iteration = document.getElementById('iteration').value;
+      const initialContentIdea = document.getElementById('initialContentIdea').value;
+
+
+      // Build output instructions section dynamically
+      let outputInstructions = '';
+      if (copytype) outputInstructions += `* 🔹 Content Type: ${copytype}\n`;
+      if (funnel) outputInstructions += `* 🔹 Funnel Stage: ${funnel}\n`;
+      if (emotion) outputInstructions += `* 🔹 Emotion Trigger: ${emotion}\n`;
+      if (bias) outputInstructions += `* 🔹 Cognitive Bias: ${bias}\n`;
+      if (format) outputInstructions += `* 🔹 Content Format: ${format}\n`;
+      if (tone) outputInstructions += `* 🔹 Voice/Tone: ${tone}\n`;
+      if (language) outputInstructions += `* 🔹 Language: ${language}\n`;
+      if (personality) outputInstructions += `* 🔹 Brand Personality: ${personality}\n`;
+      if (outputLengthSpec) outputInstructions += `* 🔹 Output Length: ${outputLengthSpec}\n`;
+      if (includeEmojis) outputInstructions += `* 🔹 Include Emojis: Yes\n`;
+      if (successMetrics) outputInstructions += `* 🔹 Success Metrics: ${successMetrics}\n`;
+      if (competitivePositioning) outputInstructions += `* 🔹 Competitive Positioning: ${competitivePositioning}\n`;
+      if (culturalInsights) outputInstructions += `* 🔹 Cultural Insights: ${culturalInsights}\n`;
+
+      outputInstructions += `* 🔹 Final Prompt Output (include 2–3 variants if possible)\n`;
+      if (language && (language.includes('Bilingual'))) {
+        outputInstructions += `* 🔹 Bangla Translation (Optional – if user specifies "Bilingual" or "BN")\n`;
+      }
+
+      // AI Humanization Framework
+      const humanizationFramework = `
+🎯 AI Humanization:
+Transform the input text so it no longer sounds like obvious AI-generated copy. Make it feel human, original, and tone-matched to the intended audience.
+
+---
+
+🛠️ APPLY THIS 7-STEP HUMANIZATION FRAMEWORK:
+
+1. **Strip the AI Voice**
+    - Remove common GPT-style phrases (e.g., “In today’s world…”).
+    - Eliminate generic intros, robotic transitions, and filler.
+    - Make structure feel natural, not formulaic.
+
+2. **Inject Personality**
+    - Add brand personality, sarcasm, cultural references, or punchy one-liners.
+    - Adjust rhythm to feel more like spoken language than formal prose.
+
+3. **Add Lived Experience / POV**
+    - Insert personal takes, analogies, or relevant anecdotes.
+    - Make it feel like it comes from a real person with skin in the game.
+
+4. **Cut the Fluff, Keep the Fire**
+    - Remove passive voice, wordy intros, and overly polite conclusions.
+    - Keep it concise and compelling. Every word must earn its place.
+
+5. **Customize for Niche & Audience**
+    - Replace generic examples with industry-specific ones.
+    - Use relevant slang, pain points, or insider language based on audience.
+
+6. **Break the Format**
+    - Add visual rhythm (bullets, short lines, bold phrases, 🔥emojis, CAPS for punch).
+    - Disrupt perfection to create flow, emphasis, and realness.
+
+7. **Run a Realness & Voice Check**
+    - Ask: Would I say this to a friend/client?
+    - If not, rewrite for clarity, authenticity, and tone alignment.
+---`;
+
+      let generatedPrompt = `Act as a globally recognized Neuromarketing Copywriting Strategist with expertise in behavioral psychology, consumer neuroscience, decision theory, digital persuasion, and funnel optimization.
+
+Your task is to generate high-performance, neuromarketing-informed content tailored to a specific funnel stage, emotional trigger, bias, and content format.
+
+Follow this content architecture and brain-based blueprint:
+
+1. Mirror Neuron Activation → Use relatable characters, testimonials, or identity-based storytelling
+2. Dopamine Tease → Create curiosity, anticipation, open loops, or micro rewards
+3. Cognitive Bias Layering → Intentionally embed loss aversion, anchoring, social proof, etc.
+4. Limbic System Engagement → Use emotional storytelling, sensory language, and brand tone
+5. Prefrontal Logic Cue → Support action with rational data, comparisons, and guarantees
+
+Reference these frameworks where applicable:
+* Fogg Behavior Model (B=MAP)
+* Cialdian's Principles of Persuasion
+* The Limbic Map (emotional profile alignment)
+* AIDA 2.0: Attention → Interest → Desire → Action
+* Neuro Value Ladder: Hook → Emotional Value → Logical Justification → Trust → Action`;
+
+      if (humanizeAI) {
+          generatedPrompt += humanizationFramework;
+      }
+
+      generatedPrompt += `\nOutput Instructions:\n${outputInstructions}${additionalSections(context, instructions, attributes, examples, formatting, iteration, competitivePositioning, culturalInsights)}`;
+
+      // Update output section for the generated prompt
+      outputSection.className = 'output-section has-content';
+      outputSection.innerHTML = `
+        <div class="output-header">
+          <div class="output-title">Generated Neuromarketing Prompt</div>
+          <button class="copy-btn" onclick="copyToClipboard('promptOutputContent')">
+            📋 Copy Prompt
+          </button>
+        </div>
+        <div class="output-content" id="promptOutputContent">${generatedPrompt}</div>
+      `;
+
+      // Reset button text to reflect next action
+      btnText.innerHTML = '<div class="loading"></div> Generating Content...';
+
+      // Scroll to prompt output
+      outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Generate AI Content using the LLM after a short delay
+      // to ensure prompt output is visible first
+      if (initialContentIdea.trim() !== '') {
+          await generateAIContent(generatedPrompt, initialContentIdea);
+      } else {
+          // If no initial content idea, just reset button and indicate no AI content generated
+          btn.disabled = false;
+          btnText.innerHTML = '✨ Generate Neuromarketing Prompt & Content';
+      }
+    }
+
+    // Helper function to build additional sections
+    function additionalSections(context, instructions, attributes, examples, formatting, iteration, competitivePositioning, culturalInsights) {
+        let sections = '';
+        if (competitivePositioning) sections += `\n⚔️ Competitive Positioning:\n${competitivePositioning}\n`;
+        if (culturalInsights) sections += `\n🌍 Cultural Insights:\n${culturalInsights}\n`;
+        if (context) sections += `\n🎯 Context & Background:\n${context}\n`;
+        if (instructions) sections += `\n🧠 Extra Instructions:\n${instructions}\n`;
+        if (attributes) sections += `\n✨ Positive Attributes:\n${attributes}\n`;
+        if (examples) sections += `\n🔁 Example(s):\n${examples}\n`;
+        if (formatting) sections += `\n🧾 Output Format:\n${formatting}\n`;
+        if (iteration) sections += `\n🧪 Iteration Prompt:\n${iteration}\n`;
+        return sections;
+    }
+
+
+    async function generateAIContent(generatedNeuromarketingPrompt, initialContentIdea) {
+        const aiContentSection = document.getElementById('aiContentSection');
+        const aiContentOutput = document.getElementById('aiContentOutput');
+        const mainGenerateBtn = document.querySelector('.generate-btn');
+        const mainBtnText = mainGenerateBtn.querySelector('.btn-text');
+
+        aiContentSection.style.display = 'block'; // Show AI content section
+        aiContentOutput.textContent = 'Generating content...'; // Show loading message
+        aiContentSection.classList.remove('has-content'); // Remove has-content class while loading
+
+        try {
+            let chatHistory = [];
+            const promptForLLM = `Using the following detailed neuromarketing prompt as your guideline:
+\`\`\`
+${generatedNeuromarketingPrompt}
+\`\`\`
+
+Now, based on the above prompt and the following initial content idea/topic, generate a compelling piece of content. Ensure the generated content strictly adheres to the principles and requirements outlined in the neuromarketing prompt (funnel stage, emotional trigger, cognitive bias, content format, tone, and language). Provide 1-2 variants if applicable for the specified content type.
+
+Initial Content Idea/Topic: "${initialContentIdea}"`;
+
+            chatHistory.push({ role: "user", parts: [{ text: promptForLLM }] });
+
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+
+            if (result.candidates && result.candidates.length > 0 &&
+                result.candidates[0].content && result.candidates[0].content.parts &&
+                result.candidates[0].content.parts.length > 0) {
+                const text = result.candidates[0].content.parts[0].text;
+                aiContentOutput.textContent = text;
+                aiContentSection.classList.add('has-content');
+            } else {
+                aiContentOutput.textContent = 'Failed to generate content. Please try again.';
+                console.error('Gemini API response was unexpected:', result);
+            }
+        } catch (error) {
+            aiContentOutput.textContent = 'Error generating content. Please check your network and try again.';
+            console.error('Error calling Gemini API:', error);
+        } finally {
+            // Reset main button
+            mainGenerateBtn.disabled = false;
+            mainBtnText.innerHTML = '✨ Generate Neuromarketing Prompt & Content';
+            aiContentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+
+    async function copyToClipboard(elementId) {
+      const content = document.getElementById(elementId).textContent;
+      // Select the copy button associated with the specific output section
+      const copyBtn = document.getElementById(elementId).closest('.output-section, .ai-content-section').querySelector('.copy-btn');
+
+      try {
+        await navigator.clipboard.writeText(content);
+
+        // Success feedback
+        copyBtn.innerHTML = '✅ Copied!';
+        copyBtn.classList.add('copied');
+
+        setTimeout(() => {
+          // Determine original text based on section
+          const originalText = elementId === 'promptOutputContent' ? '📋 Copy Prompt' : '📋 Copy Content';
+          copyBtn.innerHTML = originalText;
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      } catch (err) {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = content;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          document.execCommand('copy');
+          copyBtn.innerHTML = '✅ Copied!';
+          copyBtn.classList.add('copied');
+
+          setTimeout(() => {
+            const originalText = elementId === 'promptOutputContent' ? '📋 Copy Prompt' : '📋 Copy Content';
+            copyBtn.innerHTML = originalText;
+            copyBtn.classList.remove('copied');
+          }, 2000);
+        } catch (fallbackErr) {
+          copyBtn.innerHTML = '❌ Copy Failed';
+          setTimeout(() => {
+            const originalText = elementId === 'promptOutputContent' ? '📋 Copy Prompt' : '📋 Copy Content';
+            copyBtn.innerHTML = originalText;
+          }, 2000);
+        }
+
+        document.body.removeChild(textArea);
+      }
+    }
+
+    // New copy function for AI content - now calls the unified copyToClipboard
+    function copyAIContentToClipboard() {
+      copyToClipboard('aiContentOutput');
+    }
+
+
+    // Add subtle animations on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize theme first
+      initTheme();
+
+      const container = document.querySelector('.container');
+      container.style.opacity = '0';
+      container.style.transform = 'translateY(20px)';
+
+      setTimeout(() => {
+        container.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        container.style.opacity = '1';
+        container.style.transform = 'translateY(0)';
+      }, 100);
+
+      // Initial state of length controls
+      toggleLengthControls(); // Call this initially to set visibility based on checkbox state
+    });
+  </script>
+</body>
+</html>
+
